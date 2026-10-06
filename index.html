@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#17324d">
+  <title>DKW(早慶同)親睦麻雀大会</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <button class="title-button" id="homeButton" type="button">
+        <span class="eyebrow">2026.10.24 SAT</span>
+        <span class="site-title">DKW(早慶同)親睦麻雀大会</span>
+      </button>
+      <div class="sync-status" id="syncStatus">読み込み中...</div>
+    </div>
+  </header>
+
+  <nav class="main-nav" aria-label="メインメニュー">
+    <button class="nav-btn active" data-view="matchups">組み合わせ</button>
+    <button class="nav-btn" data-view="individual">個人成績</button>
+    <button class="nav-btn" data-view="universities">大学順位</button>
+  </nav>
+
+  <main class="page-shell">
+    <section id="view-matchups" class="view active">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">MATCHUPS</p>
+          <h1>組み合わせ</h1>
+        </div>
+        <button class="ghost-btn" id="refreshPublicButton" type="button">最新情報に更新</button>
+      </div>
+      <div class="round-tabs" id="matchupRoundTabs"></div>
+      <div id="matchupsContent"></div>
+    </section>
+
+    <section id="view-individual" class="view">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">INDIVIDUAL</p>
+          <h1>個人成績</h1>
+        </div>
+      </div>
+      <div class="notice-card compact">
+        第5回戦の卓分けは、第1〜4回戦の個人総得点順で決定します。同点者の並びは第5回戦作成時のみランダムで決定します。
+      </div>
+      <div class="table-wrap">
+        <table class="result-table" id="individualTable"></table>
+      </div>
+    </section>
+
+    <section id="view-universities" class="view">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">TEAM</p>
+          <h1>大学順位</h1>
+        </div>
+      </div>
+      <div class="notice-card compact">
+        大学順位は、各大学8名全員の得点合計で算出します。
+      </div>
+      <div id="universityCards" class="university-cards"></div>
+      <div class="table-wrap">
+        <table class="result-table" id="universityTable"></table>
+      </div>
+    </section>
+
+    <section id="view-admin" class="view">
+      <div class="section-head">
+        <div>
+          <p class="section-kicker">ORGANIZER</p>
+          <h1>幹事用</h1>
+        </div>
+        <button class="ghost-btn hidden" id="logoutButton" type="button">ログアウト</button>
+      </div>
+
+      <div id="adminLoginCard" class="admin-login card">
+        <h2>幹事ログイン</h2>
+        <p>幹事用パスワードを入力してください。</p>
+        <form id="adminLoginForm">
+          <label class="field-label" for="adminPassword">パスワード</label>
+          <div class="password-row">
+            <input id="adminPassword" type="password" autocomplete="current-password" required>
+            <button class="primary-btn" type="submit">ログイン</button>
+          </div>
+        </form>
+        <p class="form-message" id="loginMessage"></p>
+      </div>
+
+      <div id="adminPanel" class="hidden">
+        <div class="admin-status-grid" id="adminRoundStatus"></div>
+
+        <div class="admin-tabs">
+          <button class="admin-tab active" data-admin-view="scores">得点入力</button>
+          <button class="admin-tab" data-admin-view="round5">第5回戦作成</button>
+          <button class="admin-tab" data-admin-view="participants">参加者登録</button>
+        </div>
+
+        <section id="admin-scores" class="admin-view active">
+          <div class="card">
+            <div class="card-head">
+              <div>
+                <h2>得点入力</h2>
+                <p>得点は1卓ずつ独立して保存します。合計0.0でない卓は保存できません。</p>
+              </div>
+            </div>
+            <div class="round-tabs" id="adminRoundTabs"></div>
+            <div id="adminScoreTables" class="score-admin-grid"></div>
+          </div>
+        </section>
+
+        <section id="admin-round5" class="admin-view">
+          <div class="card">
+            <h2>第5回戦の組み合わせ作成</h2>
+            <p>第1〜4回戦の最新得点をSupabaseから取り直して検査したうえで作成します。</p>
+
+            <div class="r5-controls">
+              <label class="field-label" for="r5SeatMode">順位と席順</label>
+              <select id="r5SeatMode">
+                <option value="east-first">1位＝東、2位＝南、3位＝西、4位＝北</option>
+                <option value="north-first">1位＝北、2位＝西、3位＝南、4位＝東</option>
+              </select>
+              <button id="prepareRound5Button" class="primary-btn" type="button">第5回戦を作成</button>
+            </div>
+
+            <div id="round5Check" class="check-panel"></div>
+            <div id="round5Preview"></div>
+          </div>
+        </section>
+
+        <section id="admin-participants" class="admin-view">
+          <div class="card">
+            <div class="card-head">
+              <div>
+                <h2>参加者登録</h2>
+                <p>名前を変更すると、第1〜4回戦を含む全画面へ自動反映されます。</p>
+              </div>
+              <button class="primary-btn" id="saveParticipantsButton" type="button">参加者名を保存</button>
+            </div>
+            <div id="participantEditor" class="participant-editor"></div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <button id="adminLink" type="button">幹事用</button>
+  </footer>
+
+  <div id="scoreModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="scoreModalTitle">
+    <div class="modal-backdrop" data-close-modal="true"></div>
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <p class="section-kicker" id="scoreModalSub"></p>
+          <h2 id="scoreModalTitle">得点入力</h2>
+        </div>
+        <button class="icon-btn" id="closeScoreModal" type="button" aria-label="閉じる">×</button>
+      </div>
+      <form id="scoreForm">
+        <div id="scoreInputs" class="score-input-list"></div>
+        <div class="score-total-row">
+          <span>4人合計</span>
+          <strong id="scoreTotal">0.0</strong>
+        </div>
+        <p id="scoreFormMessage" class="form-message"></p>
+        <div class="modal-actions">
+          <button class="danger-btn" id="clearScoreButton" type="button">この卓をクリア</button>
+          <button class="primary-btn" type="submit">共有保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="app.js"></script>
+</body>
+</html>
