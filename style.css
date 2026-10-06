@@ -571,3 +571,12 @@ input:focus, select:focus {
   .modal-actions { flex-direction: column-reverse; }
   .modal-actions button { width: 100%; }
 }
+
+
+.round-tab:disabled {
+  opacity: .38;
+  cursor: not-allowed;
+}
+.individual-rank-tab {
+  min-width: 132px;
+}

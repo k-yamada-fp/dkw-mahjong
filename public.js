@@ -1,7 +1,7 @@
 const CONFIG={SUPABASE_URL:'https://sgimotrjhedwihrduwet.supabase.co',SUPABASE_KEY:'sb_publishable_ZccyvUUPt1_7IMnTdO2iCQ_1XyRoh8L',TOURNAMENT_ID:'dkw-2026-10-24',POLL_MS:10000};
 const sb=window.supabase.createClient(CONFIG.SUPABASE_URL,CONFIG.SUPABASE_KEY);
 const SEATS=['E','S','W','N'],SEAT_LABEL={E:'東',S:'南',W:'西',N:'北'},UNI_ORDER=['W','K','D'],UNI_NAME={W:'早稲田',K:'慶応',D:'同志社'};
-const state={participants:[],matchups:[],scores:[],activeRound:1,loading:false};
+const state={participants:[],matchups:[],scores:[],activeRound:1,individualRound:null,loading:false};
 const $=id=>document.getElementById(id);
 const escapeHtml=v=>String(v??'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;');
 const round1=v=>Math.round((Number(v)+Number.EPSILON)*10)/10;
@@ -17,12 +17,110 @@ function scoreForPlayerRound(c,r){const m=matchupByPlayer(r,c);if(!m)return null
 function toast(msg){const el=$('toast');el.textContent=msg;el.classList.remove('hidden');clearTimeout(toast.timer);toast.timer=setTimeout(()=>el.classList.add('hidden'),2600)}
 function showView(name){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));$(`view-${name}`)?.classList.add('active');document.querySelector(`.nav-btn[data-view="${name}"]`)?.classList.add('active');window.scrollTo({top:0,behavior:'smooth'})}
 async function fetchAll(){if(state.loading)return;state.loading=true;$('syncStatus').textContent='更新中...';try{const[p,m,s]=await Promise.all([sb.from('participants').select('*').eq('tournament_id',CONFIG.TOURNAMENT_ID).order('university_code').order('slot_no'),sb.from('matchups').select('*').eq('tournament_id',CONFIG.TOURNAMENT_ID).order('round_no').order('table_no'),sb.from('table_scores').select('*').eq('tournament_id',CONFIG.TOURNAMENT_ID).order('round_no').order('table_no')]);const e=p.error||m.error||s.error;if(e)throw e;state.participants=p.data||[];state.matchups=m.data||[];state.scores=s.data||[];renderAll();const dates=state.scores.map(x=>new Date(x.updated_at)).filter(d=>!isNaN(d));$('syncStatus').textContent=dates.length?`最新得点 ${new Date(Math.max(...dates.map(d=>d.getTime()))).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`:'得点未入力'}catch(e){console.error(e);$('syncStatus').textContent='通信エラー';toast('読み込みに失敗しました')}finally{state.loading=false}}
-function renderAll(){renderTabs();renderMatchups();renderIndividual();renderUniversities()}
+function renderAll(){renderTabs();renderMatchups();renderIndividualRoundTabs();renderIndividual();renderUniversities()}
 function renderTabs(){const hasR5=state.matchups.some(m=>+m.round_no===5);$('matchupRoundTabs').innerHTML=[1,2,3,4,5].map(r=>`<button class="round-tab ${state.activeRound===r?'active':''}" data-r="${r}">第${r}回戦${r===5&&!hasR5?'（未作成）':''}</button>`).join('');document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{state.activeRound=+b.dataset.r;renderTabs();renderMatchups()})}
 function renderMatchups(){const host=$('matchupsContent'),rows=state.matchups.filter(m=>+m.round_no===state.activeRound);if(!rows.length){host.innerHTML=`<div class="empty-state">第${state.activeRound}回戦の組み合わせはまだ作成されていません。</div>`;return}const pm=pMap(),sm=sMap();let h='<div class="matchup-grid">';for(let t=1;t<=6;t++){const seats=matchupFor(state.activeRound,t),sc=sm.get(scoreKey(state.activeRound,t));h+=`<article class="table-card"><div class="table-card-head"><h3>${t}卓</h3><span class="table-score-state">${sc?'得点入力済み':'未入力'}</span></div>`+seats.map(m=>{const p=pm.get(m.player_code),col={E:'east_score',S:'south_score',W:'west_score',N:'north_score'}[m.seat],v=sc?Number(sc[col]):null;return`<div class="seat-row"><span class="seat-mark">${SEAT_LABEL[m.seat]}</span><div class="player-name">${escapeHtml(displayName(p))}<span class="player-sub"><span class="university-badge ${p?.university_code||''}">${escapeHtml(p?.university_name||'')}</span> ${escapeHtml(p?.placeholder_name||'')}</span></div><span class="score-value ${scoreClass(v)}">${formatScore(v)}</span></div>`}).join('')+'</article>'}host.innerHTML=h+'</div>'}
-function playerResults(){return state.participants.map(p=>{const scores={};let total=0,rounds=0;for(let r=1;r<=5;r++){const v=scoreForPlayerRound(p.player_code,r);scores[r]=v;if(v!==null){total=round1(total+v);rounds++}}return{p,scores,total:round1(total),rounds}}).sort((a,b)=>b.total-a.total||a.p.university_code.localeCompare(b.p.university_code)||a.p.slot_no-b.p.slot_no)}
-function ranks(rows,field='total'){let prev=null,rank=0;return rows.map((x,i)=>{const v=+x[field],r=prev!==null&&Math.abs(v-prev)<.0001?rank:i+1;prev=v;rank=r;return{...x,rank:r}})}
-function renderIndividual(){const rows=ranks(playerResults());$('individualTable').innerHTML=`<thead><tr><th>順位</th><th>選手</th><th>大学</th>${[1,2,3,4,5].map(r=>`<th>${r}回戦</th>`).join('')}<th>合計</th></tr></thead><tbody>`+rows.map(x=>`<tr><td class="rank-cell">${x.rounds?x.rank:'—'}</td><td><strong>${escapeHtml(displayName(x.p))}</strong><br><span class="player-sub">${escapeHtml(x.p.placeholder_name)}</span></td><td><span class="university-badge ${x.p.university_code}">${escapeHtml(x.p.university_name)}</span></td>${[1,2,3,4,5].map(r=>`<td class="score-value ${scoreClass(x.scores[r])}">${formatScore(x.scores[r])}</td>`).join('')}<td class="total-cell score-value ${scoreClass(x.total)}">${x.rounds?formatScore(x.total):'—'}</td></tr>`).join('')+'</tbody>'}
-function universityResults(){const pr=playerResults();return UNI_ORDER.map(code=>{const mem=pr.filter(x=>x.p.university_code===code),rt={};for(let r=1;r<=5;r++)rt[r]=round1(mem.reduce((a,x)=>a+(x.scores[r]??0),0));return{code,name:UNI_NAME[code],roundTotals:rt,total:round1(mem.reduce((a,x)=>a+x.total,0))}}).sort((a,b)=>b.total-a.total||UNI_ORDER.indexOf(a.code)-UNI_ORDER.indexOf(b.code))}
+function individualRoundStatus(roundNo){
+  const rows=state.scores.filter(s=>+s.round_no===+roundNo);
+  const entered=rows.length;
+  const totalsOk=rows.filter(s=>Math.abs(Number(s.score_total))<0.05).length;
+  if(entered===0)return{entered:0,status:'not-started',label:'未開始',clickable:false};
+  if(entered===6&&totalsOk===6)return{entered:6,status:'confirmed',label:roundNo===5?'最終確定':'確定',clickable:true};
+  return{entered,status:'provisional',label:'暫定',clickable:true};
+}
+function latestAvailableIndividualRound(){
+  for(let r=5;r>=1;r--){
+    if(individualRoundStatus(r).entered>0)return r;
+  }
+  return null;
+}
+function ensureIndividualRound(){
+  const latest=latestAvailableIndividualRound();
+  if(state.individualRound===null){
+    state.individualRound=latest;
+    return;
+  }
+  if(individualRoundStatus(state.individualRound).entered===0){
+    state.individualRound=latest;
+  }
+}
+function renderIndividualRoundTabs(){
+  ensureIndividualRound();
+  const host=$('individualRoundTabs');
+  host.innerHTML=[1,2,3,4,5].map(r=>{
+    const st=individualRoundStatus(r);
+    return `<button class="round-tab individual-rank-tab ${state.individualRound===r?'active':''}" data-individual-round="${r}" ${st.clickable?'':'disabled'}>
+      第${r}回戦終了・${st.label}
+    </button>`;
+  }).join('');
+  host.querySelectorAll('[data-individual-round]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const r=+btn.dataset.individualRound;
+      if(!individualRoundStatus(r).clickable)return;
+      state.individualRound=r;
+      renderIndividualRoundTabs();
+      renderIndividual();
+    });
+  });
+}
+function playerResultsThrough(cutoffRound){
+  return state.participants.map(p=>{
+    const scores={};
+    let total=0,rounds=0;
+    for(let r=1;r<=cutoffRound;r++){
+      const v=scoreForPlayerRound(p.player_code,r);
+      scores[r]=v;
+      if(v!==null){total=round1(total+v);rounds++}
+    }
+    return{p,scores,total:round1(total),rounds};
+  }).sort((a,b)=>
+    b.total-a.total||
+    a.p.university_code.localeCompare(b.p.university_code)||
+    a.p.slot_no-b.p.slot_no
+  );
+}
+function ranks(rows,field='total'){
+  let prev=null,rank=0;
+  return rows.map((x,i)=>{
+    const v=+x[field];
+    const r=prev!==null&&Math.abs(v-prev)<.0001?rank:i+1;
+    prev=v;rank=r;
+    return{...x,rank:r};
+  });
+}
+function renderIndividual(){
+  const table=$('individualTable');
+  const notice=$('individualRoundNotice');
+  ensureIndividualRound();
+
+  if(state.individualRound===null){
+    notice.textContent='まだ得点が入力されていません。得点が1卓以上入ると、その回戦終了時点の暫定順位を確認できます。';
+    table.innerHTML='<tbody><tr><td style="text-align:center;padding:32px;color:#667789;">順位データはまだありません。</td></tr></tbody>';
+    return;
+  }
+
+  const cutoff=state.individualRound;
+  const st=individualRoundStatus(cutoff);
+  if(st.status==='confirmed'){
+    notice.textContent=cutoff===5
+      ? '第5回戦が全6卓入力済みです。最終順位です。'
+      : `第${cutoff}回戦は全6卓入力済みです。第${cutoff}回戦終了時点の確定順位です。`;
+  }else{
+    notice.textContent=`第${cutoff}回戦は進行中です。現在${st.entered}/6卓入力済みの暫定順位です。`;
+  }
+
+  const rows=ranks(playerResultsThrough(cutoff));
+  const roundHeaders=Array.from({length:cutoff},(_,i)=>i+1);
+
+  table.innerHTML=`<thead><tr><th>順位</th><th>選手</th><th>大学</th>${roundHeaders.map(r=>`<th>${r}回戦</th>`).join('')}<th>累計</th></tr></thead><tbody>`+
+    rows.map(x=>`<tr>
+      <td class="rank-cell">${x.rank}</td>
+      <td><strong>${escapeHtml(displayName(x.p))}</strong><br><span class="player-sub">${escapeHtml(x.p.placeholder_name)}</span></td>
+      <td><span class="university-badge ${x.p.university_code}">${escapeHtml(x.p.university_name)}</span></td>
+      ${roundHeaders.map(r=>`<td class="score-value ${scoreClass(x.scores[r])}">${formatScore(x.scores[r])}</td>`).join('')}
+      <td class="total-cell score-value ${scoreClass(x.total)}">${formatScore(x.total)}</td>
+    </tr>`).join('')+'</tbody>';
+}
+function universityResults(){const pr=playerResultsThrough(5);return UNI_ORDER.map(code=>{const mem=pr.filter(x=>x.p.university_code===code),rt={};for(let r=1;r<=5;r++)rt[r]=round1(mem.reduce((a,x)=>a+(x.scores[r]??0),0));return{code,name:UNI_NAME[code],roundTotals:rt,total:round1(mem.reduce((a,x)=>a+x.total,0))}}).sort((a,b)=>b.total-a.total||UNI_ORDER.indexOf(a.code)-UNI_ORDER.indexOf(b.code))}
 function renderUniversities(){const rows=ranks(universityResults());$('universityCards').innerHTML=rows.map(x=>`<div class="university-card ${x.code}"><div class="rank">${x.rank}位</div><div class="name">${x.name}</div><div class="total">${formatScore(x.total)}</div></div>`).join('');$('universityTable').innerHTML=`<thead><tr><th>順位</th><th>大学</th><th>参加者</th>${[1,2,3,4,5].map(r=>`<th>${r}回戦</th>`).join('')}<th>合計</th></tr></thead><tbody>`+rows.map(x=>`<tr><td class="rank-cell">${x.rank}</td><td><span class="university-badge ${x.code}">${x.name}</span></td><td>8名</td>${[1,2,3,4,5].map(r=>`<td class="score-value ${scoreClass(x.roundTotals[r])}">${formatScore(x.roundTotals[r])}</td>`).join('')}<td class="total-cell score-value ${scoreClass(x.total)}">${formatScore(x.total)}</td></tr>`).join('')+'</tbody>'}
 document.querySelectorAll('.nav-btn').forEach(b=>b.onclick=()=>showView(b.dataset.view));$('homeButton').onclick=()=>showView('matchups');$('refreshPublicButton').onclick=fetchAll;fetchAll();setInterval(()=>{if(document.visibilityState==='visible')fetchAll()},CONFIG.POLL_MS);
