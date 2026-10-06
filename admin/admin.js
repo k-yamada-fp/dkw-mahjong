@@ -866,9 +866,11 @@ function bindEvents() {
   document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', () => showView(btn.dataset.view));
   });
-  $('homeButton').addEventListener('click', () => showView('matchups'));
-  $('refreshPublicButton').addEventListener('click', fetchAllData);
-  $('adminLink').addEventListener('click', () => showView('admin'));
+  // 分離版の幹事ページには公開画面の一部ボタンが存在しないため、
+  // 存在する要素だけイベントを設定する。
+  $('homeButton')?.addEventListener('click', () => showView('matchups'));
+  $('refreshPublicButton')?.addEventListener('click', fetchAllData);
+  $('adminLink')?.addEventListener('click', () => showView('admin'));
   $('adminLoginForm').addEventListener('submit', adminLogin);
   $('logoutButton').addEventListener('click', adminLogout);
   $('saveParticipantsButton').addEventListener('click', saveParticipants);
