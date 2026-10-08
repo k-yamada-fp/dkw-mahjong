@@ -36,9 +36,21 @@
 
     <section id="view-individual" class="view">
       <div class="section-head"><div><p class="section-kicker">INDIVIDUAL</p><h1>個人成績</h1></div></div>
-      <div class="round-tabs" id="individualRoundTabs"></div>
-      <div class="notice-card compact" id="individualRoundNotice"></div>
-      <div class="table-wrap"><table class="result-table" id="individualTable"></table></div>
+      <div class="individual-mode-tabs">
+        <button class="individual-mode-btn active" data-individual-mode="ranking">順位表</button>
+        <button class="individual-mode-btn" data-individual-mode="person">名前別</button>
+      </div>
+      <div id="individualRankingMode">
+        <div class="round-tabs" id="individualRoundTabs"></div>
+        <div class="notice-card compact" id="individualRoundNotice"></div>
+        <div class="table-wrap"><table class="result-table" id="individualTable"></table></div>
+      </div>
+      <div id="individualPersonMode" class="hidden">
+        <div class="notice-card compact">名前を選ぶと、その人の各回戦得点・累計得点・その時点の順位を表示します。</div>
+        <div id="personSelector" class="person-selector"></div>
+        <div id="personSummary" class="person-summary"></div>
+        <div class="table-wrap"><table class="result-table" id="personHistoryTable"></table></div>
+      </div>
     </section>
 
     <section id="view-universities" class="view">
