@@ -789,9 +789,39 @@ async function confirmRound5() {
   }
 }
 
+async function deleteRound5Matchups() {
+  if (!state.adminUser) return;
+  const btn = $('deleteRound5Button');
+  btn.disabled = true;
+  try {
+    await fetchAllData();
+    const existing = state.matchups.filter(m => Number(m.round_no) === 5);
+    const scores = state.scores.filter(s => Number(s.round_no) === 5);
+    if (scores.length) { toast('第5回戦の得点が残っています。先に各卓の得点をクリアしてください。'); return; }
+    if (!existing.length) { toast('第5回戦の組み合わせは既に未作成です'); return; }
+    if (!confirm('第5回戦の組み合わせだけを削除します。第1〜4回戦のデータは残ります。よろしいですか？')) return;
+    const { data, error } = await sb.from('matchups').delete().eq('tournament_id', CONFIG.TOURNAMENT_ID).eq('round_no', 5).select('round_no');
+    if (error) throw error;
+    if ((data || []).length !== existing.length) throw new Error('削除件数が一致しません。Supabaseの状態を確認してください。');
+    state.r5Preview = null;
+    state.r5TieInfo = [];
+    $('round5Preview').innerHTML = '';
+    $('round5Check').innerHTML = '';
+    state.adminRound = 1;
+    state.activeRound = 1;
+    await fetchAllData();
+    toast('第5回戦の組み合わせを削除しました');
+  } catch (err) {
+    console.error(err);
+    toast(`削除に失敗しました: ${err.message || err}`);
+    await fetchAllData().catch(() => {});
+  } finally { btn.disabled = false; }
+}
+
 function renderRound5ExistingState() {
   if (!state.adminUser) return;
   const r5 = state.matchups.filter(m => Number(m.round_no) === 5);
+  $('deleteRound5Button').classList.toggle('hidden', r5.length === 0);
   if (r5.length === 24 && !state.r5Preview) {
     $('round5Check').innerHTML = `
       <div class="check-item check-ok" style="grid-column:1/-1;">
@@ -875,6 +905,7 @@ function bindEvents() {
   $('logoutButton').addEventListener('click', adminLogout);
   $('saveParticipantsButton').addEventListener('click', saveParticipants);
   $('prepareRound5Button').addEventListener('click', prepareRound5);
+  $('deleteRound5Button').addEventListener('click', deleteRound5Matchups);
   $('r5SeatMode').addEventListener('change', () => {
     if (state.r5Preview) prepareRound5();
   });
