@@ -616,3 +616,18 @@ input:focus, select:focus {
 
 /* トップとレポートを別タブに分離 */
 #view-home .completion-notice{border-radius:14px;overflow:hidden}
+
+/* 最小変更：トップの青い案内を他ページに合わせた白背景に統一 */
+.completion-notice{background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+.completion-eyebrow{color:var(--muted)}
+.completion-notice h2{color:var(--navy)}
+.completion-podium>div{background:#f8fafc;border:1px solid var(--line)}
+.completion-place,.completion-podium div>span:nth-last-child(2){color:var(--muted)}
+.completion-podium b{color:var(--navy)}
+.report-link-btn{background:var(--navy);color:#fff}
+.report-link-btn:hover{background:var(--navy-2)}
+.completion-notice .completion-disclaimer{color:var(--muted)}
+/* 集合写真は加工・トリミングせず、大会レポートの冒頭に表示 */
+.report-photo{margin:0 0 28px;padding:0;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.report-photo img{display:block;width:100%;height:auto}
+.report-photo figcaption{padding:10px 14px;color:var(--muted);font-size:12px;text-align:center}
