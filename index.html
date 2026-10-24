@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#17324d">
   <title>DKW(早慶同)親睦麻雀大会</title>
-  <link rel="stylesheet" href="style.css?v=20261025-report1">
+  <link rel="stylesheet" href="style.css?v=20261025-report2">
   <style>
     #view-rules .rules-text h2 { font-size: 23px; font-weight: 800; line-height: 1.4; margin: 26px 0 10px; }
     #view-rules .rules-text h2:first-of-type { margin-top: 12px; }
@@ -23,6 +23,17 @@
     </div>
   </header>
 
+  <nav class="main-nav" aria-label="メインメニュー">
+    <button class="nav-btn active" data-view="home">トップ</button>
+    <button class="nav-btn" data-view="report">大会レポート</button>
+    <button class="nav-btn" data-view="matchups">組み合わせ</button>
+    <button class="nav-btn" data-view="individual">個人成績</button>
+    <button class="nav-btn" data-view="universities">大学順位</button>
+    <button class="nav-btn" data-view="rules">競技規則</button>
+  </nav>
+
+  <main class="page-shell">
+    <section id="view-home" class="view active">
   <section class="completion-notice" aria-labelledby="completion-title">
     <div class="completion-inner">
       <p class="completion-eyebrow">2026.10.24 · 大会終了のご報告</p>
@@ -40,16 +51,9 @@
     </div>
   </section>
 
-  <nav class="main-nav" aria-label="メインメニュー">
-    <button class="nav-btn active" data-view="report">大会レポート</button>
-    <button class="nav-btn" data-view="matchups">組み合わせ</button>
-    <button class="nav-btn" data-view="individual">個人成績</button>
-    <button class="nav-btn" data-view="universities">大学順位</button>
-    <button class="nav-btn" data-view="rules">競技規則</button>
-  </nav>
+    </section>
 
-  <main class="page-shell">
-    <section id="view-report" class="view active">
+    <section id="view-report" class="view">
       <div class="section-head"><div><p class="section-kicker">TOURNAMENT REPORT · 2026.10.24</p><h1>大会レポート</h1></div></div>
       <article class="report-article">
         <div class="report-intro">
@@ -164,6 +168,6 @@
   </main>
 
   <div id="toast" class="toast hidden"></div>
-  <script src="public.js?v=20261025-report1"></script>
+  <script src="public.js?v=20261025-report2"></script>
 </body>
 </html>

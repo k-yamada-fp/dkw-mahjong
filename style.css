@@ -613,3 +613,6 @@ input:focus, select:focus {
 .report-gap{display:flex;justify-content:center;align-items:center;gap:16px;flex-wrap:wrap;margin:15px 0 2px;font-size:14px}.report-gap b{font-size:19px;color:#17324d}
 .report-record-card{display:flex;align-items:center;gap:18px;border-radius:13px;background:#f7f1df;border:1px solid #eadba9;padding:18px 22px;margin:16px 0}.report-record-icon{font-size:45px}.report-record-card>div{display:flex;flex-direction:column;gap:4px}.report-record-label{font-size:12px;color:#685b39;font-weight:800}.report-record-card strong{font-size:35px;color:#725517;line-height:1.2}.report-record-card strong small{font-size:16px}.report-thanks{background:#f5f8fb}
 @media(max-width:700px){.completion-notice{padding:23px 14px}.completion-podium{grid-template-columns:1fr;gap:8px;margin:15px 0}.completion-podium>div{padding:10px 13px}.completion-podium b{font-size:17px}.report-intro{padding:21px 17px}.report-block{padding:19px 16px}.report-comparison{padding:12px}.report-comparison-grid{grid-template-columns:1fr}.report-gap{gap:8px}.report-gap span{font-size:12px}.report-gap b{font-size:15px}}
+
+/* トップとレポートを別タブに分離 */
+#view-home .completion-notice{border-radius:14px;overflow:hidden}
