@@ -590,3 +590,26 @@ input:focus, select:focus {
 .rules-text h2:first-child { margin-top: 0; }
 .rules-text p { margin: 0 0 10px; }
 @media (max-width: 640px) { .rules-text { padding: 14px; } }
+
+/* 2026大会終了報告・レポート */
+.completion-notice{background:linear-gradient(125deg,#17324d,#244c70);color:#fff;padding:28px 24px 26px}
+.completion-inner{max-width:1080px;margin:auto;text-align:center}
+.completion-eyebrow{font-size:12px;letter-spacing:.12em;font-weight:800;color:#c4d9ed;margin:0 0 8px}
+.completion-notice h2{font-size:clamp(19px,3vw,27px);line-height:1.5;margin:0 0 12px;color:#fff}
+.completion-notice p{line-height:1.75;margin:9px 0}
+.completion-podium{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:20px auto;max-width:870px;text-align:left}
+.completion-podium>div{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:7px;row-gap:4px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);border-radius:12px;padding:14px}
+.completion-podium .medal{font-size:20px}.completion-place{font-size:12px;font-weight:800;color:#dce9f5}.completion-podium strong{font-size:16px;white-space:nowrap}.completion-podium div>span:nth-last-child(2){font-size:12px;color:#dce9f5}.completion-podium b{font-size:20px;margin-left:auto;white-space:nowrap}
+.report-link-btn{margin:12px auto 0;padding:12px 24px;border:0;border-radius:10px;background:#fff;color:#17324d;font-weight:800;font-size:15px;cursor:pointer}.report-link-btn:hover{background:#e9f1f8}
+.completion-notice .completion-disclaimer{font-size:11px;color:#d5e1ec;margin:18px 0 0}
+.report-article{max-width:900px;margin:auto;color:#24384c}.report-intro{padding:28px 32px;border-radius:16px;background:#eaf1f7;border:1px solid #d5e3ee;margin-bottom:28px}
+.report-label{font-size:12px;font-weight:800;letter-spacing:.05em;color:#416481}.report-intro h2{font-size:clamp(21px,3vw,30px);line-height:1.5;color:#17324d;margin:10px 0 16px}
+.report-article p{line-height:1.95}.report-block{background:#fff;border:1px solid #e0e7ee;border-radius:14px;padding:24px 30px;margin:0 0 22px;box-shadow:0 2px 9px rgba(20,50,75,.035)}
+.report-block h3{font-size:21px;color:#17324d;margin:0 0 14px;padding-left:12px;border-left:4px solid #4d7ba1}
+.report-highlight{font-weight:700;color:#17324d;background:#eff5fa;border-radius:9px;padding:12px 16px}.report-highlight strong{font-size:21px}
+.report-comparison{margin-top:24px;padding:18px;border-radius:12px;background:#f4f7fa}.report-comparison h4{margin:0 0 14px;font-size:17px}
+.report-comparison-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.report-player-card{border:1px solid #dce5ee;border-radius:11px;background:#fff;padding:17px}.report-player-card.winner{border:2px solid #c9a34b}
+.report-player-rank{font-size:12px;color:#5c7185;font-weight:800}.report-player-card h5{font-size:19px;margin:5px 0 14px;color:#17324d}.report-score-row{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid #e9edf2;font-size:13px}.report-score-row strong{white-space:nowrap;font-size:16px}.report-score-row.final{border-bottom:0;color:#17324d;font-weight:800}.report-score-row.final strong{font-size:20px}
+.report-gap{display:flex;justify-content:center;align-items:center;gap:16px;flex-wrap:wrap;margin:15px 0 2px;font-size:14px}.report-gap b{font-size:19px;color:#17324d}
+.report-record-card{display:flex;align-items:center;gap:18px;border-radius:13px;background:#f7f1df;border:1px solid #eadba9;padding:18px 22px;margin:16px 0}.report-record-icon{font-size:45px}.report-record-card>div{display:flex;flex-direction:column;gap:4px}.report-record-label{font-size:12px;color:#685b39;font-weight:800}.report-record-card strong{font-size:35px;color:#725517;line-height:1.2}.report-record-card strong small{font-size:16px}.report-thanks{background:#f5f8fb}
+@media(max-width:700px){.completion-notice{padding:23px 14px}.completion-podium{grid-template-columns:1fr;gap:8px;margin:15px 0}.completion-podium>div{padding:10px 13px}.completion-podium b{font-size:17px}.report-intro{padding:21px 17px}.report-block{padding:19px 16px}.report-comparison{padding:12px}.report-comparison-grid{grid-template-columns:1fr}.report-gap{gap:8px}.report-gap span{font-size:12px}.report-gap b{font-size:15px}}
